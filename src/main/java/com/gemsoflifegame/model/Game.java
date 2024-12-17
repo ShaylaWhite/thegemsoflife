@@ -65,6 +65,11 @@ public class Game {
         return feedback;
     }
 
+    // Getters
+    public int[] getSecretCombination() {
+        return secretCombination;
+    }
+
     public int getAttemptsRemaining() {
         return attemptsRemaining;
     }
