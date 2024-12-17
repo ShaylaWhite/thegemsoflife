@@ -1,52 +1,45 @@
 package com.gemsoflifegame.controller;
 
 import com.gemsoflifegame.model.Game;
-import com.gemsoflifegame.model.Guess;
-import com.gemsoflifegame.service.GameService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/game")
 public class GameController {
 
     private Game game;
-    private final GameService gameService;
 
-    @Autowired
-    public GameController(GameService gameService) {
-        this.gameService = gameService;
-        this.game = gameService.startNewGame();  // Starts the game with a random secret combination
+    // No-argument constructor that initializes the game
+    public GameController() {
+        this.game = startNewGame();  // Start a new game on controller instantiation
     }
 
-    @PostMapping("/guess")
+    private Game startNewGame() {
+        Random random = new Random();
+        int[] secretCombination = new int[4];
+        for (int i = 0; i < 4; i++) {
+            secretCombination[i] = random.nextInt(8); // Numbers between 0 and 7
+        }
+        return new Game(secretCombination);
+    }
+
+    // Endpoint to submit a player's guess
+    @PostMapping("/submitGuess")
     public String submitPlayerGuess(@RequestBody int[] playerGuess) {
         return game.submitGuess(playerGuess);
     }
 
+    // Endpoint to check if the game is over
     @GetMapping("/isGameOver")
     public boolean isGameOver() {
         return game.isGameOver();
     }
 
-    @GetMapping("/getSecretCombination")
+    // Endpoint to retrieve the secret combination (for testing or debugging)
+    @GetMapping("/secretCombination")
     public int[] getSecretCombination() {
         return game.getSecretCombination();
     }
-
-    @GetMapping("/attemptsRemaining")
-    public int getAttemptsRemaining() {
-        return game.getAttemptsRemaining();
-    }
-
-    @GetMapping("/guessHistory")
-    public List<String> getGuessHistory() {
-        return game.getGuesses().stream()
-                .map(Guess::toString)
-                .collect(Collectors.toList());
-    }
 }
-
