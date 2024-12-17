@@ -77,4 +77,8 @@ public class Game {
     public List<Guess> getGuesses() {
         return guesses;
     }
+    // Add the isGameOver() method
+    public boolean isGameOver() {
+        return attemptsRemaining <= 0;
+    }
 }
