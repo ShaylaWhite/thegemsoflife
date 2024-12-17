@@ -65,11 +65,6 @@ public class Game {
         return feedback;
     }
 
-    // Getters
-    public int[] getSecretCombination() {
-        return secretCombination;
-    }
-
     public int getAttemptsRemaining() {
         return attemptsRemaining;
     }
@@ -77,7 +72,11 @@ public class Game {
     public List<Guess> getGuesses() {
         return guesses;
     }
-    // Add the isGameOver() method
+
+    public int[] getSecretCombination() {
+        return secretCombination;
+    }
+
     public boolean isGameOver() {
         return attemptsRemaining <= 0;
     }

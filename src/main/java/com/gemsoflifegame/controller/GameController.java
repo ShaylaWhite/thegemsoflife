@@ -1,41 +1,44 @@
 package com.gemsoflifegame.controller;
 
 import com.gemsoflifegame.model.Game;
-import com.gemsoflifegame.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Random;
 
 @RestController
 @RequestMapping("/game")
 public class GameController {
 
-    @Autowired
-    private GameService gameService;
-
     private Game game;
 
-    @PostMapping("/start")
-    public String startNewGame() {
-        game = gameService.startNewGame();
-        return "Game started! You have " + game.getAttemptsRemaining() + " attempts.";
+    public GameController() {
+        // Initialize the game with a random secret combination (for example)
+        this.game = startNewGame();
     }
 
-    @PostMapping("/guess")
-    public String submitGuess(@RequestBody int[] playerGuess) {
-        if (game == null) {
-            return "Please start a new game first.";
+    // Method to start a new game with a random secret combination
+    public Game startNewGame() {
+        Random random = new Random();
+        int[] secretCombination = new int[4];
+        for (int i = 0; i < 4; i++) {
+            secretCombination[i] = random.nextInt(8);  // Numbers between 0 and 7
         }
-
-        String feedback = game.submitGuess(playerGuess);
-        return feedback;
+        return new Game(secretCombination);
     }
 
-    @GetMapping("/status")
-    public String getGameStatus() {
-        if (game == null) {
-            return "Please start a new game first.";
-        }
-        return "Attempts remaining: " + game.getAttemptsRemaining() + "\n" +
-                "Guesses: " + game.getGuesses();
+    // Method to submit a player's guess
+    public String submitPlayerGuess(int[] playerGuess) {
+        return game.submitGuess(playerGuess);
+    }
+
+    // Method to check if the game is over
+    public boolean isGameOver() {
+        return game.isGameOver();
+    }
+
+    // Method to get the secret combination (for feedback after the game ends)
+    public int[] getSecretCombination() {
+        return game.getSecretCombination();
     }
 }
