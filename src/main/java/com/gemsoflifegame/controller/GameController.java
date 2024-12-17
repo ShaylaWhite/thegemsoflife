@@ -2,31 +2,40 @@ package com.gemsoflifegame.controller;
 
 import com.gemsoflifegame.model.Game;
 import com.gemsoflifegame.service.GameService;
-import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+@RestController
+@RequestMapping("/game")
 public class GameController {
-    private Game game;
+
+    @Autowired
     private GameService gameService;
 
-    public GameController() {
-        gameService = new GameService();
-        this.game = gameService.startNewGame(); // Start a new game
+    private Game game;
+
+    @PostMapping("/start")
+    public String startNewGame() {
+        game = gameService.startNewGame();
+        return "Game started! You have " + game.getAttemptsRemaining() + " attempts.";
     }
 
-    public String submitPlayerGuess(int[] playerGuess) {
-        return game.submitGuess(playerGuess);
+    @PostMapping("/guess")
+    public String submitGuess(@RequestBody int[] playerGuess) {
+        if (game == null) {
+            return "Please start a new game first.";
+        }
+
+        String feedback = game.submitGuess(playerGuess);
+        return feedback;
     }
 
-    public int getAttemptsRemaining() {
-        return game.getAttemptsRemaining();
-    }
-
-    public int[] getSecretCombination() {
-        return game.getSecretCombination();
-    }
-
-    public boolean isGameOver() {
-        return game.getAttemptsRemaining() <= 0;
+    @GetMapping("/status")
+    public String getGameStatus() {
+        if (game == null) {
+            return "Please start a new game first.";
+        }
+        return "Attempts remaining: " + game.getAttemptsRemaining() + "\n" +
+                "Guesses: " + game.getGuesses();
     }
 }
-
