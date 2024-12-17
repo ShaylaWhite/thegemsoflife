@@ -13,5 +13,34 @@ public class Guess {
         this.lifeLesson = lifeLesson;
     }
 
-    // Getters and toString() for displaying guess info
+    // Getters
+    public int[] getPlayerGuess() {
+        return playerGuess;
+    }
+
+    public int getCorrectNumbers() {
+        return correctNumbers;
+    }
+
+    public int getCorrectPositions() {
+        return correctPositions;
+    }
+
+    public String getLifeLesson() {
+        return lifeLesson;
+    }
+
+    // toString() method to display guess info
+    @Override
+    public String toString() {
+        StringBuilder guessString = new StringBuilder();
+        guessString.append("Guess: ");
+        for (int num : playerGuess) {
+            guessString.append(num).append(" ");
+        }
+        guessString.append("| Correct Numbers: ").append(correctNumbers)
+                .append(" | Correct Positions: ").append(correctPositions)
+                .append(" | Life Lesson: ").append(lifeLesson);
+        return guessString.toString();
+    }
 }
