@@ -3,6 +3,7 @@ package com.gemsoflifegame.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.gemsoflifegame.model.Game;
+import com.gemsoflifegame.model.Guess;  // Import the Guess class
 
 import java.net.URI;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ public class GameService {
     private static final int MAX_VALUE = 7;
 
     private final RestTemplate restTemplate;
-    private Game currentGame;  // Store the current game instance
+    private Game currentGame;
 
     public GameService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -36,7 +37,7 @@ public class GameService {
                 .mapToInt(Integer::parseInt)
                 .toArray();
 
-        currentGame = new Game(secretCombination);  // Store the generated game
+        currentGame = new Game(secretCombination);
         return currentGame;
     }
 
@@ -47,6 +48,3 @@ public class GameService {
         return currentGame;
     }
 }
-
-
-

@@ -13,7 +13,6 @@ public class Guess {
         this.lifeLesson = lifeLesson;
     }
 
-    // Getters
     public int[] getPlayerGuess() {
         return playerGuess;
     }
@@ -30,7 +29,6 @@ public class Guess {
         return lifeLesson;
     }
 
-    // toString() method to display guess info
     @Override
     public String toString() {
         StringBuilder guessString = new StringBuilder();
