@@ -2,23 +2,16 @@ package com.gemsoflifegame.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Game {
     private int[] secretCombination;
     private int attemptsRemaining;
     private List<Guess> guesses;
 
-    public Game() {
-        this.secretCombination = generateSecretCombination();
+    public Game(int[] secretCombination) {
+        this.secretCombination = secretCombination;
         this.attemptsRemaining = 10;
         this.guesses = new ArrayList<>();
-    }
-
-    private int[] generateSecretCombination() {
-        // Integrate with Random Number Generator API here
-        // Mocked for now: [0, 1, 3, 5]
-        return new int[] {0, 1, 3, 5};
     }
 
     public String submitGuess(int[] playerGuess) {
@@ -55,10 +48,8 @@ public class Game {
     }
 
     private String getLifeLessonForGuess() {
-        // Add logic to pick life lessons based on the number of attempts or guesses
         String[] lessons = {"Grit", "Self-Learning", "Problem-Solving", "Perseverance", "Passion", "Self-Worth", "Belief in Yourself", "Uniqueness"};
-        Random rand = new Random();
-        return lessons[rand.nextInt(lessons.length)];
+        return lessons[guesses.size() % lessons.length];  // Rotate through lessons
     }
 
     private String getFeedback(int correctNumbers, int correctPositions, String lifeLesson) {
