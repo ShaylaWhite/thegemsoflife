@@ -1,122 +1,158 @@
 package com.gemsoflifegame.controller;
 
-import com.gemsoflifegame.service.GameService;
+import com.gemsoflifegame.Game; // Correct import for Game
+import com.gemsoflifegame.model.Guess; // Correct import for Guess
+import com.gemsoflifegame.service.GameService; // Assuming GameService is used here
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Controller class for managing the game logic and interactions with the game service.
+ */
 public class GameController {
-    private final GameService gameService;
-    private int correctNumbers;
-    private int correctPositions;
-    private int[] targetNumber;  // The number the player needs to guess
-    private boolean gameOver;
-    private List<String> guessHistory;  // To track all guesses and results
+    private final GameService gameService; // Service that handles the game operations
+    private int[] targetNumber; // The secret number combination to be guessed
+    private boolean gameOver; // Flag to indicate if the game is over
+    private List<Guess> guessHistory; // List to store all the guesses made during the game
+    private int guessCount; // Counter to track the number of guesses made
 
+    // Array of life gems, each corresponding to a quote and a life lesson based on the number of correct positions
+    private static final String[] LIFE_GEMS = {
+            "💎 Grit: \"Success is not final, failure is not fatal: It is the courage to continue that counts.\"",
+            "✨ Self-Learning: \"The beautiful thing about learning is that no one can take it away from you.\"",
+            "🔍 Problem-Solving: \"Don’t find fault, find a remedy.\"",
+            "💪 Perseverance: \"It does not matter how slowly you go as long as you do not stop.\"",
+            "🔥 Passion: \"Passion is energy. Feel the power that comes from focusing on what excites you.\"",
+            "🌟 Self-Worth: \"You are enough, just as you are.\"",
+            "🌈 Belief in Yourself: \"Believe you can and you're halfway there.\"",
+            "🌱 Uniqueness: \"Don't be afraid to be unique, embrace it!\"",
+            "🌻 Resilience: \"It's not how far you fall, but how high you bounce that counts.\"",
+            "🧠 Growth: \"The only way to do great work is to love what you do.\""
+    };
+
+    /**
+     * Constructor to initialize the game controller.
+     *
+     * @param gameService the service responsible for handling game logic
+     */
     public GameController(GameService gameService) {
         this.gameService = gameService;
         this.gameOver = false;
         this.guessHistory = new ArrayList<>();
+        this.guessCount = 0;
+        this.targetNumber = new int[4]; // Ensure targetNumber is initialized with a valid size.
     }
 
-    // Start a new game
+    /**
+     * Starts a new game by generating a random number combination and resetting the game state.
+     */
     public void startNewGame() {
-        // Generate a random 4-digit number for the game
-        targetNumber = generateRandomNumber();
-        this.correctNumbers = 0;
-        this.correctPositions = 0;
+        Game game = gameService.startNewGame(); // Generate the random number from the GameService
+        targetNumber = game.getSecretCombination(); // Get the secret combination from the game
         this.gameOver = false;
-        this.guessHistory.clear();  // Reset guess history when a new game starts
+        this.guessHistory.clear();
+        this.guessCount = 0;
     }
 
-    // Check the guess and return result
+    /**
+     * Processes a user's guess and checks it against the target number.
+     *
+     * @param guess the user's guess as an array of integers
+     * @return a message indicating the number of correct positions and correct numbers
+     */
     public String checkGuess(int[] guess) {
-        this.correctNumbers = calculateCorrectNumbers(guess);
-        this.correctPositions = calculateCorrectPositions(guess);
-
-        // Prepare result message
-        String result = "Correct Numbers: " + correctNumbers + ", Correct Positions: " + correctPositions;
-
-        // Store the guess and result in history
-        guessHistory.add("Guess: " + arrayToString(guess) + " -> " + result);
-
-        // If all numbers are correct and in the correct positions, the game is over
-        if (correctPositions == 4) {
-            gameOver = true;
-            return "Congratulations! You've won the game!";
+        // Ensure targetNumber is not null or empty before processing the guess
+        if (targetNumber == null || targetNumber.length == 0) {
+            return "Game not started yet. Please start a new game.";
         }
 
-        return result;
-    }
+        int correctPositions = 0;
+        int correctNumbers = 0;
+        List<Integer> targetList = new ArrayList<>();
+        List<Integer> guessList = new ArrayList<>();
 
-    // Getters for correct numbers and positions
-    public int getCorrectNumbers() {
-        return correctNumbers;
-    }
-
-    public int getCorrectPositions() {
-        return correctPositions;
-    }
-
-    public boolean isGameOver() {
-        return gameOver;
-    }
-
-    public List<String> getGuessHistory() {
-        return guessHistory;  // Return the guess history
-    }
-
-    // Calculate how many numbers are correct (but not necessarily in the correct position)
-    private int calculateCorrectNumbers(int[] guess) {
-        int correctCount = 0;
-        for (int i = 0; i < guess.length; i++) {
-            for (int j = 0; j < targetNumber.length; j++) {
-                if (guess[i] == targetNumber[j]) {
-                    correctCount++;
-                    break;  // Prevent double counting the same number
-                }
-            }
-        }
-        return correctCount;
-    }
-
-    // Calculate how many numbers are correct and in the correct position
-    private int calculateCorrectPositions(int[] guess) {
-        int correctPosCount = 0;
-        for (int i = 0; i < guess.length; i++) {
+        // Find numbers at correct positions
+        for (int i = 0; i < targetNumber.length; i++) {
             if (guess[i] == targetNumber[i]) {
-                correctPosCount++;
+                correctPositions++;
+            } else {
+                targetList.add(targetNumber[i]);
+                guessList.add(guess[i]);
             }
         }
-        return correctPosCount;
-    }
 
-    // Provide a hint for the player
-    public String provideHint() {
-        // Return a hint by revealing one correct number at a random position
-        int randomPosition = (int) (Math.random() * targetNumber.length);
-        return "Hint: The number at position " + (randomPosition + 1) + " is " + targetNumber[randomPosition];
-    }
-
-    // Helper method to generate a random 4-digit number
-    private int[] generateRandomNumber() {
-        int[] number = new int[4];
-        for (int i = 0; i < 4; i++) {
-            number[i] = (int) (Math.random() * 10); // Generate a random digit between 0 and 9
+        // Check remaining numbers (wrong positions) for correct values
+        for (int i = 0; i < guessList.size(); i++) {
+            if (targetList.contains(guessList.get(i))) {
+                correctNumbers++;
+                targetList.remove((Integer) guessList.get(i));
+            }
         }
-        return number;
+
+        // Create Guess object and add it to history
+        Guess newGuess = new Guess(guess, correctNumbers, correctPositions, LIFE_GEMS[correctPositions]);
+        guessHistory.add(newGuess);
+        guessCount++;
+
+        return "Correct Numbers: " + correctNumbers + ", Correct Positions: " + correctPositions;
     }
 
-    // Helper method to convert array to a string for easy display
-    private String arrayToString(int[] array) {
-        StringBuilder sb = new StringBuilder();
-        for (int i : array) {
-            sb.append(i).append(" ");
-        }
-        return sb.toString().trim();
+    /**
+     * Checks if the game is over.
+     *
+     * @return true if the game is over or the guess count reaches 10, false otherwise
+     */
+    public boolean isGameOver() {
+        return gameOver || guessCount >= 10;
     }
 
-    // Getter for the target number (to display in the game or use in UI)
-    public int[] getTargetNumber() {
+    /**
+     * Checks if the user's guess is correct.
+     *
+     * @param guess the user's guess as an array of integers
+     * @return true if the guess matches the target number, false otherwise
+     */
+    public boolean isCorrectGuess(int[] guess) {
+        return Arrays.equals(guess, targetNumber);
+    }
+
+    /**
+     * Retrieves the history of all guesses made in the game.
+     *
+     * @return a list of Guess objects representing the user's guesses
+     */
+    public List<Guess> getGuessHistory() {
+        return guessHistory;
+    }
+
+    /**
+     * Retrieves the current target number for the game.
+     *
+     * @return the current secret number combination
+     */
+    public int[] getCurrentGameSecretCombination() {
         return targetNumber;
+    }
+
+    /**
+     * Submits a guess and processes it.
+     * This is a placeholder method and may be used to trigger game logic or actions on submission.
+     *
+     * @param guess the user's guess as an array of integers
+     */
+    public String submitGuess(int[] guess) {
+        // Call checkGuess to evaluate the guess
+        return checkGuess(guess);
+    }
+
+    /**
+     * Retrieves the current game instance.
+     *
+     * @return the current Game object
+     */
+    public Game getCurrentGame() {
+        return gameService.getCurrentGame(); // Assuming GameService has this method
     }
 }
