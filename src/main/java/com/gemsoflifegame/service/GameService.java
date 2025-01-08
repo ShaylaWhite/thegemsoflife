@@ -25,10 +25,11 @@ public class GameService {
     private static final int MIN_VALUE = 0;
     private static final int MAX_VALUE = 7;
 
-    // RestTemplate used for making HTTP requests
+    // RestTemplate used for making HTTP requests, simplifies the process of making HTTP requests and handling responses.
     private final RestTemplate restTemplate;
 
     // Holds the current game instance
+    // This design ensures that the game state is kept in a single object, which is easy to manage and access.
     private Game currentGame;
 
     public GameService(RestTemplate restTemplate) {
@@ -54,6 +55,7 @@ public class GameService {
         return currentGame;
     }
 
+    //
     public Game getCurrentGame() {
         if (currentGame == null) {
             throw new IllegalStateException("No game is currently active.");

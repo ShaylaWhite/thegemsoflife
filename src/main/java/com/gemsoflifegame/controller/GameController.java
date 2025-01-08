@@ -10,6 +10,9 @@ import java.util.List;
 
 /**
  * Controller class for managing the game logic and interactions with the game service.
+ * The game state is managed using class-level variables allowing the controller to maintain the state of a single game session.
+ * delegates core game logic (like generating random numbers) to the GameService, ensuring a clean separation between business logic and user-facing logic.
+ * MVC (Model-View-Controller) pattern, where the controller manages the flow of data between the model (game logic) and the user interface.
  */
 public class GameController {
     private final GameService gameService; // Service that handles the game operations
@@ -18,7 +21,10 @@ public class GameController {
     private List<Guess> guessHistory; // List to store all the guesses made during the game
     private int guessCount; // Counter to track the number of guesses made
 
+    //Private fields and methods ensure encapsulation, exposing only the necessary functionality via public methods.
+
     // Array of life gems, each corresponding to a quote and a life lesson based on the number of correct positions
+
     private static final String[] LIFE_GEMS = {
             "💎 Grit: \"Success is not final, failure is not fatal: It is the courage to continue that counts.\"",
             "✨ Self-Learning: \"The beautiful thing about learning is that no one can take it away from you.\"",

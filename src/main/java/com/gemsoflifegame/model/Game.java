@@ -7,11 +7,12 @@ import java.util.List;
 /**
  * This class represents the game logic of a number-guessing game.
  * It handles the secret combination, user guesses, and tracks game history.
+ * Game State Management
  */
 public class Game {
     private int[] secretCombination;
     private int guessCount;
-    private List<Guess> guessHistory;
+    private List<Guess> guessHistory;   //
 
     // Array of motivational gems and corresponding life lessons
     private static final String[] LIFE_GEMS = {
@@ -42,6 +43,8 @@ public class Game {
 
     /**
      * Constructs a Game object with a secret combination.
+     * The constructor initializes the secret combination and sets up a history log for guesses.
+     * Using a list (ArrayList) ensures scalability for tracking guesses
      *
      * @param secretCombination the secret combination that players must guess
      */
